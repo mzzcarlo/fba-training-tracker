@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>FBA Classic Training Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#002776;font-family:Arial,sans-serif;color:#fff;padding:20px;min-height:100vh}
+h1{color:#ffdf00;font-size:22px;margin-bottom:5px}
+.sub{color:#8fbc8f;font-size:13px;margin-bottom:20px}
+.error-box{background:#ff4444;color:#fff;padding:15px;border-radius:8px;margin-bottom:20px;display:block}
+.tabs{display:flex;gap:5px;margin-bottom:20px;border-bottom:2px solid rgba(255,223,0,0.3);padding-bottom:0}
+.tabs button{background:none;border:none;color:#8fbc8f;padding:10px 20px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tabs button.on{color:#ffdf00;border-bottom-color:#ffdf00}
+.tabs button:hover{color:#ffdf00}
+.box{background:rgba(0,50,100,0.4);border:1px solid rgba(0,156,59,0.2);border-radius:10px;padding:16px;margin-bottom:16px}
+.box h2{color:#ffdf00;font-size:15px;margin-bottom:12px}
+.box h2.green{color:#009c3b}
+label{display:block;color:#8fbc8f;font-size:11px;text-transform:uppercase;margin-bottom:6px}
+select,textarea{width:100%;padding:10px;border:1px solid rgba(0,156,59,0.3);border-radius:6px;background:rgba(0,30,80,0.6);color:#fff;font-size:14px;font-family:Arial,sans-serif}
+textarea{height:70px;resize:vertical}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px}
+.card{background:rgba(0,50,100,0.4);border:1px solid rgba(255,223,0,0.15);border-radius:10px;padding:14px;text-align:center}
+.card .num{font-size:26px;font-weight:bold;font-family:monospace}
+.card .lbl{font-size:10px;color:#8fbc8f;text-transform:uppercase;margin-top:4px}
+.green{color:#009c3b}
+.yellow{color:#ffdf00}
+.red{color:#ff6b6b}
+.blue{color:#48dbfb}
+.bar-bg{background:rgba(255,255,255,0.1);border-radius:8px;height:12px;margin-bottom:5px}
+.bar-fill{background:linear-gradient(90deg,#009c3b,#ffdf00);height:100%;border-radius:8px;transition:width 0.3s}
+.bar-label{font-size:11px;color:#8fbc8f;text-align:right}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:#8fbc8f;padding:8px;border-bottom:1px solid rgba(0,156,59,0.3);font-size:11px;text-transform:uppercase}
+td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);color:#ddd}
+tr:hover td{background:rgba(0,156,59,0.05)}
+.mhdr td{background:rgba(0,156,59,0.15);color:#ffdf00;font-weight:bold;font-size:12px}
+.ssel{padding:4px 8px;border-radius:12px;font-size:11px;font-weight:bold;border:1px solid rgba(255,255,255,0.1);cursor:pointer;min-width:100px}
+.ssel.not-started{background:rgba(255,255,255,0.05);color:#999}
+.ssel.in-progress{background:rgba(255,223,0,0.15);color:#ffdf00;border-color:rgba(255,223,0,0.3)}
+.ssel.completed{background:rgba(0,156,59,0.2);color:#00e64d;border-color:rgba(0,156,59,0.4)}
+.note{background:rgba(0,156,59,0.08);border:1px solid rgba(0,156,59,0.15);border-radius:6px;padding:10px;margin-bottom:8px;border-left:3px solid #ffdf00;position:relative}
+.note.coach{border-left-color:#009c3b}
+.note .nm{font-size:11px;color:#8fbc8f;margin-bottom:3px}
+.note .tx{font-size:13px;color:#ddd}
+.xbtn{position:absolute;top:6px;right:6px;background:rgba(255,0,0,0.2);border:1px solid rgba(255,0,0,0.3);color:#ff6b6b;border-radius:3px;padding:1px 6px;font-size:10px;cursor:pointer}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:flex-end}
+.row select,.row textarea{flex:1;min-width:140px}
+.btn{padding:10px 16px;border:none;border-radius:6px;font-size:13px;font-weight:bold;cursor:pointer}
+.btn-g{background:#009c3b;color:#fff}
+.btn-y{background:#ffdf00;color:#002776}
+.btn-r{background:rgba(255,0,0,0.2);color:#ff6b6b;border:1px solid rgba(255,0,0,0.3)}
+.btn:hover{opacity:0.9}
+.abar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.toast{position:fixed;bottom:20px;right:20px;background:#009c3b;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:999}
+.toast.on{opacity:1}
+.hide{display:none}
+.dim{color:#556b55;font-size:13px;font-style:italic}
+.footer{text-align:center;font-size:11px;color:rgba(255,223,0,0.3);margin-top:20px;padding-top:16px;border-top:1px solid rgba(0,156,59,0.1)}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}table{font-size:11px}td,th{padding:5px}.row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<h1>FBA Classic Training Advance Tracker - Brasil</h1>
+<p class="sub">Brasil Marketplace | Delta Training Progress Dashboard</p>
+
+<div class="error-box" id="errBox">
+  JavaScript is not running. Please make sure you saved this file with .html extension and opened it directly in Chrome, Edge, or Firefox. Do not open from email or restricted environments.
+</div>
+
+<div id="app" class="hide">
+
+<div class="tabs" id="tabBar">
+  <button class="on" id="tb1">Participant View</button>
+  <button id="tb2">Trainer View</button>
+</div>
+
+<div id="vP">
+  <div class="box">
+    <label>Select Participant</label>
+    <select id="sp"></select>
+  </div>
+  <div class="grid" id="sg"></div>
+  <div class="bar-bg"><div class="bar-fill" id="bf" style="width:0%"></div></div>
+  <div class="bar-label" id="bl">0 of 42 lessons completed</div>
+  <div class="box" style="margin-top:16px">
+    <h2>Training Lessons - Click status to update</h2>
+    <table><thead><tr><th>#</th><th>Topic</th><th>Status</th><th>Date</th></tr></thead><tbody id="lt"></tbody></table>
+  </div>
+  <div class="box">
+    <h2>My Questions</h2>
+    <div id="ql"></div>
+    <div class="row">
+      <select id="qs"></select>
+      <textarea id="qt" placeholder="Type your question here..."></textarea>
+      <button class="btn btn-y" id="qb">Submit</button>
+    </div>
+  </div>
+  <div class="box">
+    <h2 class="green">Coaching Notes from Trainer</h2>
+    <div id="cl"></div>
+  </div>
+</div>
+
+<div id="vT" class="hide">
+  <div class="abar">
+    <button class="btn btn-g" id="eb">Export CSV</button>
+    <button class="btn btn-r" id="rb">Reset All</button>
+  </div>
+  <div class="box">
+    <h2>Class Overview</h2>
+    <table><thead><tr><th>Participant</th><th>Done</th><th>In Prog</th><th>Not Started</th><th>Progress</th><th>Questions</th></tr></thead><tbody id="to"></tbody></table>
+  </div>
+  <div class="grid" id="tg"></div>
+  <div class="box">
+    <h2>Pending Questions</h2>
+    <div id="tq"></div>
+  </div>
+  <div class="box">
+    <h2 class="green">Add Coaching Note</h2>
+    <div class="row">
+      <select id="cp"></select>
+      <select id="cs"></select>
+    </div>
+    <div class="row">
+      <textarea id="ct" placeholder="Write coaching feedback..."></textarea>
+      <button class="btn btn-g" id="cb">Send</button>
+    </div>
+  </div>
+  <div class="box">
+    <h2 class="green">Recent Coaching</h2>
+    <div id="tc"></div>
+  </div>
+  <div class="box">
+    <h2>Module Progress</h2>
+    <table><thead><tr><th>Module</th><th>datathag</th><th>somsajiv</th><th>jasmnco</th><th>gnzalu</th><th>mzzcarlo</th></tr></thead><tbody id="tm"></tbody></table>
+  </div>
+</div>
+
+</div>
+
+<div class="toast" id="tt"></div>
+<div class="footer">Amazon Brasil Marketplace - FBA Classic Delta Training 2026</div>
+
+<script>
+try {
+
+var P = ["datathag","somsajiv","jasmnco","gnzalu","mzzcarlo"];
+
+var M = [
+{n:"Orientation",l:[{i:1,n:"You are Here"},{i:2,n:"Why is this Delta Training Important"},{i:3,n:"Whats Next"}]},
+{n:"FBA Classic Overview",l:[{i:4,n:"Getting Set Up"},{i:5,n:"Resources and Preparation"},{i:6,n:"Introduction"},{i:7,n:"Eligibility Criteria"},{i:8,n:"Fee"},{i:9,n:"Branches"},{i:10,n:"Review"}]},
+{n:"FBA Listing",l:[{i:11,n:"Resources and Preparation"},{i:12,n:"FBA Listing"},{i:13,n:"Prohibited and Restricted Products"},{i:14,n:"Assisting Selling Partners"},{i:15,n:"Review"}]},
+{n:"FBA Inbound Inventory",l:[{i:16,n:"Resources and Preparation"},{i:17,n:"FBA Inbound Inventory"},{i:18,n:"Storage Capacity Limit"},{i:19,n:"Stranded Inventory - FBA Onsite"},{i:20,n:"Stranded Inventory - FBA Classic"},{i:21,n:"Reserved Inventory"},{i:22,n:"Quarantined ASINs"},{i:23,n:"Shortage Overage"},{i:24,n:"Review"}]},
+{n:"FBA Shipment Creation",l:[{i:25,n:"Resources and Preparation"},{i:26,n:"FBA Shipment Creation Intro"},{i:27,n:"Amazon Partnered Carrier Program"},{i:28,n:"FBA Send to Amazon"},{i:29,n:"Self-Shipment"},{i:30,n:"Assisting Selling Partners"},{i:31,n:"Review"}]},
+{n:"FBA Invoicer",l:[{i:32,n:"FBA Invoicer"},{i:33,n:"Invoicer Console"},{i:34,n:"Invoicer Console"},{i:35,n:"Invoicer Setting"},{i:36,n:"Assisting Selling Partners"},{i:37,n:"Review"}]},
+{n:"Removal Reimbursements",l:[{i:38,n:"Resources and Preparation"},{i:39,n:"BR FBA Removal Reimbursements"},{i:40,n:"Removal Order Reimbursement"},{i:41,n:"Review"}]},
+{n:"Final Assessment",l:[{i:42,n:"BR FBA Delta - Final Assessment"}]}
+];
+
+var ST;
+
+function makeNew() {
+  var s = {p:{},q:[],c:[]};
+  for (var x = 0; x < P.length; x++) {
+    s.p[P[x]] = {};
+    for (var y = 1; y <= 42; y++) {
+      s.p[P[x]][y] = {s:"not-started",d:""};
+    }
+  }
+  return s;
+}
+
+function load() {
+  try {
+    var r = localStorage.getItem("fba4");
+    if (r) {
+      var o = JSON.parse(r);
+      if (o && o.p && o.q && o.c) return o;
+    }
+  } catch(e) {}
+  return makeNew();
+}
+
+function save() {
+  try { localStorage.setItem("fba4", JSON.stringify(ST)); } catch(e) {}
+  toast("Saved!");
+}
+
+function toast(m) {
+  var t = document.getElementById("tt");
+  t.textContent = m;
+  t.className = "toast on";
+  setTimeout(function() { t.className = "toast"; }, 2000);
+}
+
+function gln(id) {
+  for (var a = 0; a < M.length; a++) {
+    for (var b = 0; b < M[a].l.length; b++) {
+      if (M[a].l[b].i === id) return M[a].l[b].n;
+    }
+  }
+  return "";
+}
+
+function stats(p) {
+  var c=0,ip=0,ns=0;
+  for (var i=1;i<=42;i++) {
+    var v = ST.p[p][i].s;
+    if (v==="completed") c++;
+    else if (v==="in-progress") ip++;
+    else ns++;
+  }
+  return {c:c,ip:ip,ns:ns,pct:Math.round((c/42)*100)};
+}
+
+function fillSel(id, arr, blank) {
+  var s = document.getElementById(id);
+  s.innerHTML = "";
+  if (blank) {
+    var o = document.createElement("option");
+    o.value = "";
+    o.textContent = "-- Select --";
+    s.appendChild(o);
+  }
+  for (var i=0;i<arr.length;i++) {
+    var o2 = document.createElement("option");
+    o2.value = arr[i];
+    o2.textContent = arr[i];
+    s.appendChild(o2);
+  }
+}
+
+function fillLessons(id) {
+  var s = document.getElementById(id);
+  s.innerHTML = "";
+  var o = document.createElement("option");
+  o.value = "";
+  o.textContent = "-- Select Lesson --";
+  s.appendChild(o);
+  for (var a=0;a<M.length;a++) {
+    for (var b=0;b<M[a].l.length;b++) {
+      var o2 = document.createElement("option");
+      o2.value = M[a].l[b].i;
+      o2.textContent = M[a].l[b].i + ". " + M[a].l[b].n;
+      s.appendChild(o2);
+    }
+  }
+}
+
+function getP() { return document.getElementById("sp").value; }
+
+function renderP() {
+  var p = getP();
+  if (!p) return;
+  var s = stats(p);
+  var qc = 0;
+  for (var i=0;i<ST.q.length;i++) { if (ST.q[i].p===p) qc++; }
+
+  document.getElementById("sg").innerHTML =
+    '<div class="card"><div class="num green">'+s.c+'</div><div class="lbl">Completed</div></div>'+
+    '<div class="card"><div class="num yellow">'+s.ip+'</div><div class="lbl">In Progress</div></div>'+
+    '<div class="card"><div class="num red">'+s.ns+'</div><div class="lbl">Not Started</div></div>'+
+    '<div class="card"><div class="num blue">'+s.pct+'%</div><div class="lbl">Progress</div></div>'+
+    '<div class="card"><div class="num yellow">'+qc+'</div><div class="lbl">Questions</div></div>';
+
+  document.getElementById("bf").style.width = s.pct+"%";
+  document.getElementById("bl").textContent = s.c+" of 42 lessons completed";
+
+  var h = "";
+  for (var a=0;a<M.length;a++) {
+    h += '<tr class="mhdr"><td colspan="4">Module '+(a+1)+': '+M[a].n+'</td></tr>';
+    for (var b=0;b<M[a].l.length;b++) {
+      var ls = M[a].l[b];
+      var d = ST.p[p][ls.i];
+      h += '<tr><td>'+ls.i+'</td><td>'+ls.n+'</td>';
+      h += '<td><select class="ssel '+d.s+'" data-id="'+ls.i+'">';
+      h += '<option value="not-started"'+(d.s==="not-started"?" selected":"")+'>Not Started</option>';
+      h += '<option value="in-progress"'+(d.s==="in-progress"?" selected":"")+'>In Progress</option>';
+      h += '<option value="completed"'+(d.s==="completed"?" selected":"")+'>Completed</option>';
+      h += '</select></td>';
+      h += '<td style="font-size:11px;color:#8fbc8f">'+(d.d||"-")+'</td></tr>';
+    }
+  }
+  document.getElementById("lt").innerHTML = h;
+
+  var sels = document.getElementById("lt").getElementsByTagName("select");
+  for (var x=0;x<sels.length;x++) {
+    sels[x].onchange = function() {
+      var lid = parseInt(this.getAttribute("data-id"));
+      var nv = this.value;
+      ST.p[p][lid].s = nv;
+      if (nv === "completed") {
+        var now = new Date();
+        ST.p[p][lid].d = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+      } else {
+        ST.p[p][lid].d = "";
+      }
+      save();
+      renderP();
+    };
+  }
+
+  var qh = "";
+  var items = [];
+  for (var qi=0;qi<ST.q.length;qi++) {
+    if (ST.q[qi].p === p) items.push({idx:qi, data:ST.q[qi]});
+  }
+  if (items.length === 0) {
+    qh = '<p class="dim">No questions yet.</p>';
+  } else {
+    for (var qj=0;qj<items.length;qj++) {
+      var qq = items[qj].data;
+      qh += '<div class="note"><button class="xbtn" data-qi="'+items[qj].idx+'">X</button>';
+      qh += '<div class="nm">Lesson '+qq.l+' - '+gln(qq.l)+' | '+qq.d+'</div>';
+      qh += '<div class="tx">'+qq.t+'</div></div>';
+    }
+  }
+  document.getElementById("ql").innerHTML = qh;
+  var dbs = document.getElementById("ql").getElementsByClassName("xbtn");
+  for (var di=0;di<dbs.length;di++) {
+    dbs[di].onclick = function() {
+      var idx = parseInt(this.getAttribute("data-qi"));
+      ST.q.splice(idx,1);
+      save();
+      renderP();
+    };
+  }
+
+  var ch = "";
+  var citems = [];
+  for (var ci=0;ci<ST.c.length;ci++) {
+    if (ST.c[ci].p === p) citems.push(ST.c[ci]);
+  }
+  if (citems.length === 0) {
+    ch = '<p class="dim">No coaching notes yet.</p>';
+  } else {
+    for (var cj=0;cj<citems.length;cj++) {
+      var cc = citems[cj];
+      ch += '<div class="note coach"><div class="nm">Lesson '+cc.l+' - '+gln(cc.l)+' | '+cc.d+'</div>';
+      ch += '<div class="tx">'+cc.t+'</div></div>';
+    }
+  }
+  document.getElementById("cl").innerHTML = ch;
+}
+
+function renderT() {
+  var h = "";
+  for (var i=0;i<P.length;i++) {
+    var s = stats(P[i]);
+    var qc = 0;
+    for (var j=0;j<ST.q.length;j++) { if (ST.q[j].p===P[i]) qc++; }
+    h += '<tr><td><b>'+P[i]+'</b></td>';
+    h += '<td class="green">'+s.c+'</td>';
+    h += '<td class="yellow">'+s.ip+'</td>';
+    h += '<td>'+s.ns+'</td>';
+    h += '<td class="blue"><b>'+s.pct+'%</b></td>';
+    h += '<td class="yellow">'+qc+'</td></tr>';
+  }
+  document.getElementById("to").innerHTML = h;
+
+  var tc = 0;
+  for (var k=0;k<P.length;k++) {
+    for (var n=1;n<=42;n++) { if (ST.p[P[k]][n].s==="completed") tc++; }
+  }
+  var avg = Math.round((tc/(42*P.length))*100);
+  document.getElementById("tg").innerHTML =
+    '<div class="card"><div class="num blue">5</div><div class="lbl">Participants</div></div>'+
+    '<div class="card"><div class="num green">'+avg+'%</div><div class="lbl">Avg Progress</div></div>'+
+    '<div class="card"><div class="num yellow">'+ST.q.length+'</div><div class="lbl">Questions</div></div>'+
+    '<div class="card"><div class="num yellow">42</div><div class="lbl">Lessons</div></div>'+
+    '<div class="card"><div class="num green">'+ST.c.length+'</div><div class="lbl">Coaching</div></div>';
+
+  var qh = "";
+  if (ST.q.length === 0) {
+    qh = '<p class="dim">No pending questions.</p>';
+  } else {
+    for (var qi=0;qi<ST.q.length;qi++) {
+      var qq = ST.q[qi];
+      qh += '<div class="note"><div class="nm"><b>'+qq.p+'</b> - Lesson '+qq.l+': '+gln(qq.l)+' | '+qq.d+'</div>';
+      qh += '<div class="tx">'+qq.t+'</div></div>';
+    }
+  }
+  document.getElementById("tq").innerHTML = qh;
+
+  var ch2 = "";
+  if (ST.c.length === 0) {
+    ch2 = '<p class="dim">No coaching notes yet.</p>';
+  } else {
+    for (var ci=ST.c.length-1;ci>=0;ci--) {
+      var cc = ST.c[ci];
+      ch2 += '<div class="note coach"><div class="nm">To: <b>'+cc.p+'</b> - Lesson '+cc.l+': '+gln(cc.l)+' | '+cc.d+'</div>';
+      ch2 += '<div class="tx">'+cc.t+'</div></div>';
+    }
+  }
+  document.getElementById("tc").innerHTML = ch2;
+
+  var mh = "";
+  for (var mi=0;mi<M.length;mi++) {
+    mh += '<tr><td>'+(mi+1)+'. '+M[mi].n+'</td>';
+    for (var pi=0;pi<P.length;pi++) {
+      var done = 0;
+      for (var li=0;li<M[mi].l.length;li++) {
+        if (ST.p[P[pi]][M[mi].l[li].i].s==="completed") done++;
+      }
+      var tot = M[mi].l.length;
+      var mc = "not-started";
+      if (done===tot) mc = "completed";
+      else if (done>0) mc = "in-progress";
+      mh += '<td><span class="ssel '+mc+'" style="display:inline-block;padding:2px 6px;border-radius:10px;font-size:11px;min-width:auto">'+done+'/'+tot+'</span></td>';
+    }
+    mh += '</tr>';
+  }
+  document.getElementById("tm").innerHTML = mh;
+}
+
+ST = load();
+
+document.getElementById("errBox").style.display = "none";
+document.getElementById("app").className = "";
+
+document.getElementById("tb1").onclick = function() {
+  document.getElementById("tb1").className = "on";
+  document.getElementById("tb2").className = "";
+  document.getElementById("vP").className = "";
+  document.getElementById("vT").className = "hide";
+  renderP();
+};
+document.getElementById("tb2").onclick = function() {
+  document.getElementById("tb2").className = "on";
+  document.getElementById("tb1").className = "";
+  document.getElementById("vT").className = "";
+  document.getElementById("vP").className = "hide";
+  renderT();
+};
+
+fillSel("sp", P, false);
+fillSel("cp", P, true);
+fillLessons("qs");
+fillLessons("cs");
+
+document.getElementById("sp").onchange = function() { renderP(); };
+
+document.getElementById("qb").onclick = function() {
+  var p = getP();
+  var lid = document.getElementById("qs").value;
+  var txt = document.getElementById("qt").value;
+  if (!lid || !txt || txt.trim()==="") { toast("Select lesson and type question"); return; }
+  ST.q.push({p:p, l:parseInt(lid), t:txt.trim(), d:new Date().toLocaleDateString()});
+  document.getElementById("qt").value = "";
+  save();
+  renderP();
+};
+
+document.getElementById("cb").onclick = function() {
+  var p = document.getElementById("cp").value;
+  var lid = document.getElementById("cs").value;
+  var txt = document.getElementById("ct").value;
+  if (!p || !lid || !txt || txt.trim()==="") { toast("Fill all fields"); return; }
+  ST.c.push({p:p, l:parseInt(lid), t:txt.trim(), d:new Date().toLocaleDateString()});
+  document.getElementById("ct").value = "";
+  save();
+  renderT();
+};
+
+document.getElementById("eb").onclick = function() {
+  var lines = ["Participant,Lesson,Name,Status,Date"];
+  for (var i=0;i<P.length;i++) {
+    for (var a=0;a<M.length;a++) {
+      for (var b=0;b<M[a].l.length;b++) {
+        var ls = M[a].l[b];
+        var d = ST.p[P[i]][ls.i];
+        lines.push(P[i]+","+ls.i+","+ls.n+","+d.s+","+(d.d||""));
+      }
+    }
+  }
+  var csv = lines.join(String.fromCharCode(10));
+  var blob = new Blob([csv], {type:"text/csv"});
+  var url = URL.createObjectURL(blob);
+  var a2 = document.createElement("a");
+  a2.href = url;
+  a2.download = "fba_progress.csv";
+  document.body.appendChild(a2);
+  a2.click();
+  document.body.removeChild(a2);
+  toast("CSV exported!");
+};
+
+document.getElementById("rb").onclick = function() {
+  if (confirm("Reset ALL data? This cannot be undone.")) {
+    localStorage.removeItem("fba4");
+    ST = makeNew();
+    renderP();
+    toast("All data reset!");
+  }
+};
+
+renderP();
+
+} catch(e) {
+  document.getElementById("errBox").textContent = "Error: " + e.message;
+  document.getElementById("errBox").style.display = "block";
+}
+</script>
+
+</body>
+</html>
